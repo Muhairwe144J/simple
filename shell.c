@@ -76,7 +76,7 @@ char *strip_comments(char *command)
 {
 	char *result;
 	int len = strlen(command) + 1;
-	int i;
+	int i, j;
 
 	result = malloc(len);
 	if (result == NULL)
@@ -85,14 +85,14 @@ char *strip_comments(char *command)
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; command[i] != '\0' && command[i] != '#'; i++)
+	for (i = 0, j = 0; command[i] != '\0' && command[i] != '#'; i++)
 	{
-		result[i] = command[i];
+		result[j++] = command[i];
 	}
 
-	result[i] = '\0';
+	result[j] = '\0';
 
-	return result;
+	return (result);
 }
 
 /**
@@ -154,7 +154,7 @@ int execute_command_with_logical(char *command)
 	if (pid == -1)
 	{
 		perror("fork");
-		return -1;
+		return (-1);
 	}
 
 	if (pid == 0)
@@ -174,16 +174,16 @@ int execute_command_with_logical(char *command)
 		if (WIFEXITED(status))
 		{
 			if (WEXITSTATUS(status) != 0)
-				return -1; /* Command failed */
+				return (-1); /* Command failed */
 		}
 		else
 		{
 			perror("waitpid");
-			return -1; /* waitpid failed */
+			return (-1); /* waitpid failed */
 		}
 	}
 
-	return 0;
+	return (0);
 }
 
 /**
@@ -229,13 +229,13 @@ char *find_command_path(char *command)
 	struct stat st;
 
 	if (path == NULL)
-		return NULL;
+		return (NULL);
 
 	path_copy = strdup(path);
 
 	if (path_copy == NULL)
 	{
-		perror("strdup");
+void run_shell(void);  // Declaration of the main shell function		perror("strdup");
 		_exit(EXIT_FAILURE);
 	}
 
@@ -257,7 +257,7 @@ char *find_command_path(char *command)
 		if (stat(full_path, &st) == 0)
 		{
 			free(path_copy);
-			return full_path;
+			return (full_path);
 		}
 
 		free(full_path);
@@ -265,7 +265,7 @@ char *find_command_path(char *command)
 	}
 
 	free(path_copy);
-	return NULL;
+	return (NULL);
 }
 
 /**
@@ -278,10 +278,10 @@ int change_directory(char *path)
 	if (chdir(path) == -1)
 	{
 		perror("chdir");
-		return -1;
+		return (-1);
 	}
 
-	return 0;
+	return (0);
 }
 
 /**
@@ -297,10 +297,10 @@ int set_env_variable(char *name, char *value)
 	if (setenv(name, value, overwrite) == -1)
 	{
 		perror("setenv");
-		return -1;
+		return (-1);
 	}
 
-	return 0;
+	return (0);
 }
 
 /**
@@ -368,7 +368,7 @@ ssize_t _getline(char **lineptr, size_t *n)
 	*lineptr = buffer;
 	*n = size;
 
-	return bytes_read;
+	return (bytes_read);
 }
 
 /**
@@ -405,7 +405,7 @@ char **tokenize_input(char *input)
 
 	tokens[i] = NULL;
 
-	return tokens;
+	return (tokens);
 }
 
 /**
@@ -440,7 +440,7 @@ int set_alias(char *name, char *value)
 			if (aliases[i].name == NULL)
 			{
 				perror("strdup");
-				return -1;
+				return (-1);
 			}
 
 			aliases[i].value = strdup(value);
@@ -449,10 +449,10 @@ int set_alias(char *name, char *value)
 				perror("strdup");
 				free(aliases[i].name);
 				aliases[i].name = NULL;
-				return -1;
+				return (-1);
 			}
 
-			return 0; /* Alias set successfully */
+			return (0); /* Alias set successfully */
 		}
 		else if (strcmp(aliases[i].name, name) == 0)
 		{
@@ -461,14 +461,14 @@ int set_alias(char *name, char *value)
 			if (aliases[i].value == NULL)
 			{
 				perror("strdup");
-				return -1;
+				return (-1);
 			}
 
-			return 0; /* Alias modified successfully */
+			return (0); /* Alias modified successfully */
 		}
 	}
 
-	return -1; /* No space for new alias */
+	return (-1); /* No space for new alias */
 }
 
 /**
@@ -522,10 +522,6 @@ void shell_alias(char *input)
 
 /* Definition of global array to store aliases */
 struct Alias aliases[MAX_ALIASES];
-
-/**
- * ... (previous code remains unchanged)
- */
 
 /**
  * replace_variables - Replace variables in a command
@@ -603,7 +599,7 @@ char *replace_variables(char *command)
 		}
 	}
 
-	return result;
+	return (result);
 }
 
 /**
@@ -636,10 +632,6 @@ void execute_file_commands(const char *filename)
 	fclose(file);
 }
 
-/**
- * main - Entry point for the simple shell program
- * Return: Always 0
- */
 int main(void)
 {
 	char *input = NULL;
@@ -670,9 +662,12 @@ int main(void)
 		else if (strcmp(command, "unsetenv") == 0)
 			unset_env_variable(args[1]);
 		else if (strcmp(command, "cd") == 0)
-			change_directory(args[1]);
+			change_directory(args[0]);
+		else if (strcmp(command, "alias") == 0)
+			shell_alias(args[1]);  /* Assuming the alias command has format: alias name=value */
 		else
 			execute_command(command);
 	}
 
-	return 0;}
+	return (0);
+}

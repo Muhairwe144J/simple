@@ -76,6 +76,11 @@ char **tokenize_input(char *input);
 
 char *replace_variables(char *command);
 
+/**
+ * Remove comments from a command
+ * @param command: The command to remove comments from
+ * @return: The command without comments
+ */
 char *strip_comments(char *command);
 
 /**
@@ -109,12 +114,23 @@ struct Alias
 /* Global array to store aliases */
 extern struct Alias aliases[MAX_ALIASES];
 
-/* Function prototypes */
+/**
+ * Print aliases
+ */
 void print_aliases(void);
-
+/**
+ * Set or modify an alias
+ * @param name: The name of the alias
+ * @param value: The value of the alias
+ * @return: 0 on success, -1 on failure
+ */
 int set_alias(char *name, char *value);
-
+/**
+ * Handle the alias command
+ * @param input: The user input
+ */
 void shell_alias(char *input);
 
+void run_shell(void);  /* Declaration of the main shell function */
 
 #endif /* SHELL_H */
